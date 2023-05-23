@@ -58,8 +58,7 @@ public class CustomerDAOImpl {
         Connection connection = DBConnection.getDbConnection().getConnection();
         ResultSet rst = connection.createStatement().executeQuery("SELECT id FROM Customer ORDER BY id DESC LIMIT 1;");
         if (rst.next()) {
-            String id = rst.getString("id");
-            return id;
+            return rst.getString("id");
         }
         return null;
     }

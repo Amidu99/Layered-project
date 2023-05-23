@@ -3,7 +3,6 @@ package controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import dao.CustomerDAOImpl;
-import db.DBConnection;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,7 +19,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.CustomerDTO;
 import view.tdm.CustomerTM;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
@@ -87,8 +85,8 @@ public class ManageCustomersFormController {
                   ));
                }
                   tblCustomers.setItems(obList);
-            } catch (SQLException | ClassNotFoundException throwable) {
-                throwable.printStackTrace();
+            } catch (SQLException | ClassNotFoundException e) {
+                new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
             }
     }
 
@@ -215,10 +213,8 @@ public class ManageCustomersFormController {
             tblCustomers.getSelectionModel().clearSelection();
             initUI();
 
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to delete the customer " + id).show();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
     }
 
@@ -228,13 +224,15 @@ public class ManageCustomersFormController {
             //property injection
             CustomerDAOImpl customerDAO = new CustomerDAOImpl();
             id = customerDAO.getNextId();
-            int newCustomerId = Integer.parseInt(id.replace("C00-", "")) + 1;
-            return String.format("C00-%03d", newCustomerId);
+
+            if(id!=null) {
+                int newCustomerId = Integer.parseInt(id.replace("C00-", "")) + 1;
+                return String.format("C00-%03d", newCustomerId);
+            }else{
+                return "C00-001";
+            }
         } catch (SQLException | ClassNotFoundException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
-        }
-        if(id==null) {
-            return "C00-001";
         }
         if (tblCustomers.getItems().isEmpty()) {
             return "C00-001";
