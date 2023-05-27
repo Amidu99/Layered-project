@@ -1,10 +1,11 @@
 package bo.custom;
 
+import bo.SuperBO;
 import model.OrderDTO;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public interface OrderBO {
+public interface OrderBO extends SuperBO {
     //ArrayList<OrderDTO> getAllOrder() throws SQLException, ClassNotFoundException;
     boolean addOrder(OrderDTO dto) throws SQLException, ClassNotFoundException;
     //boolean updateOrder(OrderDTO dto) throws SQLException, ClassNotFoundException;

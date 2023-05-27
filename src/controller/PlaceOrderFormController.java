@@ -1,7 +1,7 @@
 package controller;
 
+import bo.BOFactory;
 import bo.custom.PlaceOrderBO;
-import bo.custom.impl.PlaceOrderBOImpl;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
@@ -57,7 +57,10 @@ public class PlaceOrderFormController {
     //OrderBO orderBO = new OrderBOImpl();
     //CustomerBO customerBO = new CustomerBOImpl();
     //ItemBO itemBO = new ItemBOImpl();
-    PlaceOrderBO placeOrderBO = new PlaceOrderBOImpl();
+    //PlaceOrderBO placeOrderBO = new PlaceOrderBOImpl();
+
+    //with Factory Design Pattern
+    PlaceOrderBO placeOrderBO = (PlaceOrderBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.PLACE_ORDER);
 
     public void initialize() throws SQLException, ClassNotFoundException {
 
@@ -121,13 +124,10 @@ public class PlaceOrderFormController {
             }
         });
 
-
         cmbItemCode.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newItemCode) -> {
             txtQty.setEditable(newItemCode != null);
             btnSave.setDisable(newItemCode == null);
-
             if (newItemCode != null) {
-
                 /*Find Item*/
                 try {
                     if (!existItem(newItemCode + "")) {
@@ -141,13 +141,11 @@ public class PlaceOrderFormController {
                     txtDescription.setText(item.getDescription());
                     txtUnitPrice.setText(item.getUnitPrice().setScale(2).toString());
 
-//                    txtQtyOnHand.setText(tblOrderDetails.getItems().stream().filter(detail-> detail.getCode().equals(item.getCode())).<Integer>map(detail-> item.getQtyOnHand() - detail.getQty()).findFirst().orElse(item.getQtyOnHand()) + "");
+//                  txtQtyOnHand.setText(tblOrderDetails.getItems().stream().filter(detail-> detail.getCode().equals(item.getCode())).<Integer>map(detail-> item.getQtyOnHand() - detail.getQty()).findFirst().orElse(item.getQtyOnHand()) + "");
                     Optional<OrderDetailTM> optOrderDetail = tblOrderDetails.getItems().stream().filter(detail -> detail.getCode().equals(newItemCode)).findFirst();
                     txtQtyOnHand.setText((optOrderDetail.isPresent() ? item.getQtyOnHand() - optOrderDetail.get().getQty() : item.getQtyOnHand()) + "");
 
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                } catch (ClassNotFoundException e) {
+                } catch (SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             } else {
@@ -307,7 +305,6 @@ public class PlaceOrderFormController {
     }
 
     public boolean saveOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) {
-        PlaceOrderBO placeOrderBO = new PlaceOrderBOImpl();
         return placeOrderBO.saveOrder(orderId, orderDate, customerId, orderDetails);
     }
 }

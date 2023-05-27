@@ -1,13 +1,16 @@
 package bo.custom.impl;
 
 import bo.custom.OrderBO;
+import dao.DAOFactory;
 import dao.custom.OrderDAO;
-import dao.custom.impl.OrderDAOImpl;
 import model.OrderDTO;
 import java.sql.SQLException;
 
 public class OrderBOImpl implements OrderBO {
-    OrderDAO orderDAO = new OrderDAOImpl();
+    //OrderDAO orderDAO = new OrderDAOImpl();
+
+    //with Factory Design Pattern
+    OrderDAO orderDAO = (OrderDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.ORDER);
 
     @Override
     public boolean addOrder(OrderDTO dto) throws SQLException, ClassNotFoundException {

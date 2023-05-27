@@ -1,14 +1,17 @@
 package bo.custom.impl;
 
 import bo.custom.OrderDetailBO;
+import dao.DAOFactory;
 import dao.custom.OrderDetailsDAO;
-import dao.custom.impl.OrderDetailsDAOImpl;
 import model.OrderDetailDTO;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class OrderDetailBOImpl implements OrderDetailBO {
-    OrderDetailsDAO orderDetailsDAO = new OrderDetailsDAOImpl();
+    //OrderDetailsDAO orderDetailsDAO = new OrderDetailsDAOImpl();
+
+    //with Factory Design Pattern
+    OrderDetailsDAO orderDetailsDAO = (OrderDetailsDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.ORDER_DETAILS);
 
     @Override
     public ArrayList<OrderDetailDTO> getAllOrderDetail() {

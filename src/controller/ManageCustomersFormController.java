@@ -1,9 +1,9 @@
 package controller;
 
+import bo.BOFactory;
 import bo.custom.CustomerBO;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import dao.DAOFactory;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static dao.DAOFactory.DAOTypes.CUSTOMER;
-
 /**
  * @author : Sanu Vithanage
  * @since : 0.1.0
@@ -45,8 +43,9 @@ public class ManageCustomersFormController {
     //DI (Property Injection)
     //CustomerDAO customerDAO = new CustomerDAOImpl();
     //CustomerBO customerBO = new CustomerBOImpl();
+
     //with Factory Design Pattern
-    CustomerBO customerBO = (CustomerBO) DAOFactory.getDaoFactory().getDAO(CUSTOMER);
+    CustomerBO customerBO = (CustomerBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMER);
 
     public void initialize() {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -184,11 +183,9 @@ public class ManageCustomersFormController {
         btnAddNewCustomer.fire();
     }
 
-
     boolean existCustomer(String id) throws SQLException, ClassNotFoundException {
        return customerBO.existCustomer(id);
     }
-
 
     public void btnDelete_OnAction(ActionEvent actionEvent) {
         /*Delete Customer*/
@@ -204,7 +201,6 @@ public class ManageCustomersFormController {
             tblCustomers.getItems().remove(tblCustomers.getSelectionModel().getSelectedItem());
             tblCustomers.getSelectionModel().clearSelection();
             initUI();
-
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to delete the customer " + id).show();
         } catch (ClassNotFoundException e) {
@@ -222,7 +218,6 @@ public class ManageCustomersFormController {
             e.printStackTrace();
         }
 
-
         if (tblCustomers.getItems().isEmpty()) {
             return "C00-001";
         } else {
@@ -230,7 +225,6 @@ public class ManageCustomersFormController {
             int newCustomerId = Integer.parseInt(id.replace("C", "")) + 1;
             return String.format("C00-%03d", newCustomerId);
         }
-
     }
 
     private String getLastCustomerId() {

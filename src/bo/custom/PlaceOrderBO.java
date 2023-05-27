@@ -1,5 +1,6 @@
 package bo.custom;
 
+import bo.SuperBO;
 import model.CustomerDTO;
 import model.ItemDTO;
 import model.OrderDetailDTO;
@@ -8,7 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface PlaceOrderBO {
+public interface PlaceOrderBO extends SuperBO {
     boolean saveOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails);
     ItemDTO findItem(String code);
     CustomerDTO search(String id) throws SQLException, ClassNotFoundException;
