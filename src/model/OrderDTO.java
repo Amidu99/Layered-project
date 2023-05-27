@@ -1,6 +1,5 @@
 package model;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -9,9 +8,9 @@ import java.time.LocalDate;
  * @since : 0.1.0
  **/
 
-public class OrderDTO  {
-    private String orderId;
-    private LocalDate orderDate;
+public class OrderDTO {
+    private String oid;
+    private LocalDate date;
     private String customerId;
     private String customerName;
     private BigDecimal orderTotal;
@@ -19,28 +18,42 @@ public class OrderDTO  {
     public OrderDTO() {
     }
 
-    public OrderDTO(String orderId, LocalDate orderDate, String customerId, String customerName, BigDecimal orderTotal) {
-        this.orderId = orderId;
-        this.orderDate = orderDate;
+    public OrderDTO(String oid, LocalDate date, String customerId) {
+        this.oid = oid;
+        this.date = date;
+        this.customerId = customerId;
+    }
+
+    public OrderDTO(String oid, LocalDate date, String customerId, String customerName, BigDecimal orderTotal) {
+        this.oid = oid;
+        this.date = date;
+        this.customerId = customerId;
+        this.customerName = customerName;
+        this.orderTotal = orderTotal;
+    }
+
+    public OrderDTO(String oid, String date, String customerId, String customerName, BigDecimal orderTotal) {
+        this.oid = oid;
+        this.date = LocalDate.parse(date);
         this.customerId = customerId;
         this.customerName = customerName;
         this.orderTotal = orderTotal;
     }
 
     public String getOrderId() {
-        return orderId;
+        return oid;
     }
 
     public void setOrderId(String orderId) {
-        this.orderId = orderId;
+        this.oid = oid;
     }
 
     public LocalDate getOrderDate() {
-        return orderDate;
+        return date;
     }
 
     public void setOrderDate(LocalDate orderDate) {
-        this.orderDate = orderDate;
+        this.date = orderDate;
     }
 
     public String getCustomerId() {
@@ -70,8 +83,8 @@ public class OrderDTO  {
     @Override
     public String toString() {
         return "OrderDTO{" +
-                "orderId='" + orderId + '\'' +
-                ", orderDate=" + orderDate +
+                "orderId='" + oid + '\'' +
+                ", orderDate=" + date +
                 ", customerId='" + customerId + '\'' +
                 ", customerName='" + customerName + '\'' +
                 ", orderTotal=" + orderTotal +

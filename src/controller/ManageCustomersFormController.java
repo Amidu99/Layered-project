@@ -1,11 +1,10 @@
 package controller;
 
+import bo.custom.CustomerBO;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import dao.CustomerDAOImpl;
+import dao.DAOFactory;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,10 +20,12 @@ import model.CustomerDTO;
 import view.tdm.CustomerTM;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static dao.DAOFactory.DAOTypes.CUSTOMER;
 
 /**
  * @author : Sanu Vithanage
@@ -41,11 +42,16 @@ public class ManageCustomersFormController {
     public TableView<CustomerTM> tblCustomers;
     public JFXButton btnAddNewCustomer;
 
+    //DI (Property Injection)
+    //CustomerDAO customerDAO = new CustomerDAOImpl();
+    //CustomerBO customerBO = new CustomerBOImpl();
+    //with Factory Design Pattern
+    CustomerBO customerBO = (CustomerBO) DAOFactory.getDaoFactory().getDAO(CUSTOMER);
+
     public void initialize() {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
         tblCustomers.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("name"));
         tblCustomers.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("address"));
-
         initUI();
 
         tblCustomers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -63,31 +69,22 @@ public class ManageCustomersFormController {
                 txtCustomerAddress.setDisable(false);
             }
         });
-
         txtCustomerAddress.setOnAction(event -> btnSave.fire());
         loadAllCustomers();
     }
 
     private void loadAllCustomers() {
         tblCustomers.getItems().clear();
-        /*Get all customers*/
-            try {
-               ObservableList<CustomerTM> obList = FXCollections.observableArrayList();
-               //property injection
-               CustomerDAOImpl customerDAO = new CustomerDAOImpl();
-               List<CustomerDTO> custList = customerDAO.getAllCustomer();
-
-               for(CustomerDTO customer : custList) {
-                  obList.add(new CustomerTM(
-                      customer.getId(),
-                      customer.getName(),
-                      customer.getAddress()
-                  ));
-               }
-                  tblCustomers.setItems(obList);
-            } catch (SQLException | ClassNotFoundException e) {
-                new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
+        try {
+            /*Get all customers*/
+            //ArrayList<CustomerDTO> allCustomers = customerDAO.getAll();
+            ArrayList<CustomerDTO> allCustomers = customerBO.getAllCustomer();
+            for (CustomerDTO c : allCustomers) {
+                tblCustomers.getItems().add(new CustomerTM(c.getId(), c.getName(), c.getAddress()));
             }
+        } catch (SQLException | ClassNotFoundException e) {
+            new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
+        }
     }
 
     private void initUI() {
@@ -149,9 +146,9 @@ public class ManageCustomersFormController {
                 if (existCustomer(id)) {
                     new Alert(Alert.AlertType.ERROR, id + " already exists").show();
                 }
-                //property injection
-                CustomerDAOImpl customerDAO = new CustomerDAOImpl();
-                boolean added = customerDAO.addCustomer(new CustomerDTO(id, name, address));
+
+                //Add Customer
+                customerBO.addCustomer(new CustomerDTO(id,name,address));
 
                 tblCustomers.getItems().add(new CustomerTM(id, name, address));
             } catch (SQLException e) {
@@ -167,36 +164,31 @@ public class ManageCustomersFormController {
                 if (!existCustomer(id)) {
                     new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + id).show();
                 }
-                //property injection
-                CustomerDAOImpl customerDAO = new CustomerDAOImpl();
-                boolean updated = customerDAO.updateCustomer(new CustomerDTO(id, name, address));
+
+                //Update Customer
+                //customerBO.updateCustomer(new CustomerDTO(id,name,address));
+                customerBO.updateCustomer(new CustomerDTO(id,name,address));
 
             } catch (SQLException e) {
                 new Alert(Alert.AlertType.ERROR, "Failed to update the customer " + id + e.getMessage()).show();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
+
             CustomerTM selectedCustomer = tblCustomers.getSelectionModel().getSelectedItem();
             selectedCustomer.setName(name);
             selectedCustomer.setAddress(address);
             tblCustomers.refresh();
         }
+
         btnAddNewCustomer.fire();
     }
 
 
-
-    public boolean existCustomer(String id){
-        //property injection
-        CustomerDAOImpl customerDAO = new CustomerDAOImpl();
-        boolean isExist=false;
-        try {
-            isExist = customerDAO.existCustomer(id);
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return isExist;
+    boolean existCustomer(String id) throws SQLException, ClassNotFoundException {
+       return customerBO.existCustomer(id);
     }
+
 
     public void btnDelete_OnAction(ActionEvent actionEvent) {
         /*Delete Customer*/
@@ -205,42 +197,40 @@ public class ManageCustomersFormController {
             if (!existCustomer(id)) {
                 new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + id).show();
             }
-            //property injection
-            CustomerDAOImpl customerDAO = new CustomerDAOImpl();
-            boolean deleted = customerDAO.deleteCustomer(id);
+
+            //Delete Customer
+            customerBO.deleteCustomer(id);
 
             tblCustomers.getItems().remove(tblCustomers.getSelectionModel().getSelectedItem());
             tblCustomers.getSelectionModel().clearSelection();
             initUI();
 
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to delete the customer " + id).show();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
     private String generateNewId() {
-        String id=null;
         try {
-            //property injection
-            CustomerDAOImpl customerDAO = new CustomerDAOImpl();
-            id = customerDAO.getNextId();
-
-            if(id!=null) {
-                int newCustomerId = Integer.parseInt(id.replace("C00-", "")) + 1;
-                return String.format("C00-%03d", newCustomerId);
-            }else{
-                return "C00-001";
-            }
-        } catch (SQLException | ClassNotFoundException e) {
+            //Generate New ID
+            return customerBO.generateNewID();
+        } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
+
+
         if (tblCustomers.getItems().isEmpty()) {
             return "C00-001";
         } else {
-            id = getLastCustomerId();
+            String id = getLastCustomerId();
             int newCustomerId = Integer.parseInt(id.replace("C", "")) + 1;
             return String.format("C00-%03d", newCustomerId);
         }
+
     }
 
     private String getLastCustomerId() {
