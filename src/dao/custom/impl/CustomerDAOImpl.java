@@ -1,9 +1,8 @@
 package dao.custom.impl;
 
-
 import dao.SQLUtil;
 import dao.custom.CustomerDAO;
-import model.CustomerDTO;
+import entity.Customer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,23 +10,23 @@ import java.util.ArrayList;
 public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
-    public ArrayList<CustomerDTO> getAll() throws SQLException, ClassNotFoundException {
-        ArrayList<CustomerDTO> allCustomers = new ArrayList<>();
+    public ArrayList<Customer> getAll() throws SQLException, ClassNotFoundException {
+        ArrayList<Customer> allCustomers = new ArrayList<>();
         ResultSet rst = SQLUtil.execute("SELECT * FROM Customer");
         while (rst.next()) {
-            CustomerDTO customerDTO = new CustomerDTO(rst.getString("id"), rst.getString("name"), rst.getString("address"));
+            Customer customerDTO = new Customer(rst.getString("id"), rst.getString("name"), rst.getString("address"));
             allCustomers.add(customerDTO);
         }
         return allCustomers;
     }
 
     @Override
-    public boolean add(CustomerDTO dto) throws SQLException, ClassNotFoundException {
+    public boolean add(Customer dto) throws SQLException, ClassNotFoundException {
         return SQLUtil.execute("INSERT INTO Customer (id,name, address) VALUES (?,?,?)", dto.getId(), dto.getName(), dto.getAddress());
     }
 
     @Override
-    public boolean update(CustomerDTO dto) throws SQLException, ClassNotFoundException {
+    public boolean update(Customer dto) throws SQLException, ClassNotFoundException {
         return SQLUtil.execute("UPDATE Customer SET name=?, address=? WHERE id=?", dto.getName(), dto.getAddress(), dto.getId());
     }
 
@@ -55,9 +54,9 @@ public class CustomerDAOImpl implements CustomerDAO {
     }
 
     @Override
-    public CustomerDTO search(String id) throws SQLException, ClassNotFoundException {
+    public Customer search(String id) throws SQLException, ClassNotFoundException {
         ResultSet rst = SQLUtil.execute("SELECT * FROM Customer WHERE id=?", id + "");
         rst.next();
-        return new CustomerDTO(id + "", rst.getString("name"), rst.getString("address"));
+        return new Customer(id + "", rst.getString("name"), rst.getString("address"));
     }
 }

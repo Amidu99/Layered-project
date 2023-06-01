@@ -1,9 +1,9 @@
 package dao.custom;
 
 import dao.CrudDAO;
-import model.OrderDetailDTO;
+import entity.OrderDetail;
 
-public interface OrderDetailsDAO extends CrudDAO<OrderDetailDTO> {
+public interface OrderDetailsDAO extends CrudDAO<OrderDetail> {
     //public boolean saveOrderDetails(OrderDetailDTO dto) throws SQLException, ClassNotFoundException;
     public void specialMethod();
 }

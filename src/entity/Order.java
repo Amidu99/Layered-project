@@ -1,39 +1,25 @@
-package model;
+package entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
-/**
- * @author : Sanu Vithanage
- * @since : 0.1.0
- **/
-
-public class OrderDTO {
+public class Order {
     private String oid;
     private LocalDate date;
     private String customerId;
     private String customerName;
     private BigDecimal orderTotal;
-    List<OrderDetailDTO> orderDetails;
 
-    public OrderDTO() {
+    public Order() {
     }
 
-    public OrderDTO(String oid, LocalDate date, String customerId) {
+    public Order(String oid, LocalDate date, String customerId) {
         this.oid = oid;
         this.date = date;
         this.customerId = customerId;
     }
 
-    public OrderDTO(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) {
-        this.oid = orderId;
-        this.date = orderDate;
-        this.customerId = customerId;
-        this.orderDetails = orderDetails;
-    }
-
-    public OrderDTO(String oid, LocalDate date, String customerId, String customerName, BigDecimal orderTotal) {
+    public Order(String oid, LocalDate date, String customerId, String customerName, BigDecimal orderTotal) {
         this.oid = oid;
         this.date = date;
         this.customerId = customerId;
@@ -41,16 +27,12 @@ public class OrderDTO {
         this.orderTotal = orderTotal;
     }
 
-    public OrderDTO(String oid, String date, String customerId, String customerName, BigDecimal orderTotal) {
+    public Order(String oid, String date, String customerId, String customerName, BigDecimal orderTotal) {
         this.oid = oid;
         this.date = LocalDate.parse(date);
         this.customerId = customerId;
         this.customerName = customerName;
         this.orderTotal = orderTotal;
-    }
-
-    public List<OrderDetailDTO> getOrderDetails() {
-        return orderDetails;
     }
 
     public String getOrderId() {
@@ -91,16 +73,5 @@ public class OrderDTO {
 
     public void setOrderTotal(BigDecimal orderTotal) {
         this.orderTotal = orderTotal;
-    }
-
-    @Override
-    public String toString() {
-        return "OrderDTO{" +
-                "orderId='" + oid + '\'' +
-                ", orderDate=" + date +
-                ", customerId='" + customerId + '\'' +
-                ", customerName='" + customerName + '\'' +
-                ", orderTotal=" + orderTotal +
-                '}';
     }
 }

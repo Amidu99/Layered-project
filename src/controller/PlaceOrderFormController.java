@@ -19,6 +19,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.CustomerDTO;
 import model.ItemDTO;
+import model.OrderDTO;
 import model.OrderDetailDTO;
 import view.tdm.OrderDetailTM;
 import java.io.IOException;
@@ -84,7 +85,7 @@ public class PlaceOrderFormController {
         });
 
         orderId = generateNewOrderId();
-        lblId.setText("Order ID: " + orderId);
+        lblId.setText("OrderDTO ID: " + orderId);
         lblDate.setText(LocalDate.now().toString());
         btnPlaceOrder.setDisable(true);
         txtCustomerName.setFocusTraversable(false);
@@ -128,22 +129,22 @@ public class PlaceOrderFormController {
             txtQty.setEditable(newItemCode != null);
             btnSave.setDisable(newItemCode == null);
             if (newItemCode != null) {
-                /*Find Item*/
+                /*Find ItemDTO*/
                 try {
                     if (!existItem(newItemCode + "")) {
-//                        throw new NotFoundException("There is no such item associated with the id " + code);
+//                        throw new NotFoundException("There is no such itemDTO associated with the id " + code);
                     }
 
-                    //Search Item
-                    //ItemDTO item = itemBO.searchItem(newItemCode + "");
-                    ItemDTO item = placeOrderBO.searchItem(newItemCode+"");
+                    //Search ItemDTO
+                    //ItemDTO itemDTO = itemBO.searchItem(newItemCode + "");
+                    ItemDTO itemDTO = placeOrderBO.searchItem(newItemCode+"");
 
-                    txtDescription.setText(item.getDescription());
-                    txtUnitPrice.setText(item.getUnitPrice().setScale(2).toString());
+                    txtDescription.setText(itemDTO.getDescription());
+                    txtUnitPrice.setText(itemDTO.getUnitPrice().setScale(2).toString());
 
-//                  txtQtyOnHand.setText(tblOrderDetails.getItems().stream().filter(detail-> detail.getCode().equals(item.getCode())).<Integer>map(detail-> item.getQtyOnHand() - detail.getQty()).findFirst().orElse(item.getQtyOnHand()) + "");
+//                  txtQtyOnHand.setText(tblOrderDetails.getItems().stream().filter(detail-> detail.getCode().equals(itemDTO.getCode())).<Integer>map(detail-> itemDTO.getQtyOnHand() - detail.getQty()).findFirst().orElse(itemDTO.getQtyOnHand()) + "");
                     Optional<OrderDetailTM> optOrderDetail = tblOrderDetails.getItems().stream().filter(detail -> detail.getCode().equals(newItemCode)).findFirst();
-                    txtQtyOnHand.setText((optOrderDetail.isPresent() ? item.getQtyOnHand() - optOrderDetail.get().getQty() : item.getQtyOnHand()) + "");
+                    txtQtyOnHand.setText((optOrderDetail.isPresent() ? itemDTO.getQtyOnHand() - optOrderDetail.get().getQty() : itemDTO.getQtyOnHand()) + "");
 
                 } catch (SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
@@ -208,8 +209,8 @@ public class PlaceOrderFormController {
     private void loadAllItemCodes() {
         try {
             /*Get all items*/
-            ArrayList<ItemDTO> allItems = placeOrderBO.getAllItem();
-            for (ItemDTO i : allItems) {
+            ArrayList<ItemDTO> allItemDTOS = placeOrderBO.getAllItem();
+            for (ItemDTO i : allItemDTOS) {
                 cmbItemCode.getItems().add(i.getCode());
             }
         } catch (SQLException e) {
@@ -290,13 +291,13 @@ public class PlaceOrderFormController {
                 tblOrderDetails.getItems().stream().map(tm -> new OrderDetailDTO(orderId,tm.getCode(), tm.getQty(), tm.getUnitPrice())).collect(Collectors.toList()));
 
         if (b) {
-            new Alert(Alert.AlertType.INFORMATION, "Order has been placed successfully").show();
+            new Alert(Alert.AlertType.INFORMATION, "OrderDTO has been placed successfully").show();
         } else {
-            new Alert(Alert.AlertType.ERROR, "Order has not been placed successfully").show();
+            new Alert(Alert.AlertType.ERROR, "OrderDTO has not been placed successfully").show();
         }
 
         orderId = generateNewOrderId();
-        lblId.setText("Order Id: " + orderId);
+        lblId.setText("OrderDTO Id: " + orderId);
         cmbCustomerId.getSelectionModel().clearSelection();
         cmbItemCode.getSelectionModel().clearSelection();
         tblOrderDetails.getItems().clear();
@@ -304,7 +305,8 @@ public class PlaceOrderFormController {
         calculateTotal();
     }
 
-    public boolean saveOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) {
-        return placeOrderBO.saveOrder(orderId, orderDate, customerId, orderDetails);
+    public boolean saveOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetailDTOS) {
+        //return placeOrderBO.saveOrder(orderId, orderDate, customerId, orderDetailDTOS);
+        return placeOrderBO.saveOrder(new OrderDTO(orderId, orderDate, customerId, orderDetailDTOS));
     }
 }

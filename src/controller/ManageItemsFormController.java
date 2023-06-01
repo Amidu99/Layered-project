@@ -75,8 +75,8 @@ public class ManageItemsFormController {
         tblItems.getItems().clear();
         try {
             /*Get all items*/
-            ArrayList<ItemDTO> allItems = itemBO.getAllItem();
-            for (ItemDTO i : allItems) {
+            ArrayList<ItemDTO> allItemDTOS = itemBO.getAllItem();
+            for (ItemDTO i : allItemDTOS) {
                 tblItems.getItems().add(new ItemTM(i.getCode(), i.getDescription(), i.getUnitPrice(), i.getQtyOnHand()));
             }
         } catch (SQLException e) {
@@ -128,7 +128,7 @@ public class ManageItemsFormController {
     }
 
     public void btnDelete_OnAction(ActionEvent actionEvent) {
-        /*Delete Item*/
+        /*Delete ItemDTO*/
         String code = tblItems.getSelectionModel().getSelectedItem().getCode();
         try {
             if (!existItem(code)) {
@@ -174,7 +174,7 @@ public class ManageItemsFormController {
                 if (existItem(code)) {
                     new Alert(Alert.AlertType.ERROR, code + " already exists").show();
                 }
-                //Save Item
+                //Save ItemDTO
                 itemBO.addItem(new ItemDTO(code, description, unitPrice, qtyOnHand));
 
                 tblItems.getItems().add(new ItemTM(code, description, unitPrice, qtyOnHand));
@@ -189,7 +189,7 @@ public class ManageItemsFormController {
                 if (!existItem(code)) {
                     new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
                 }
-                /*Update Item*/
+                /*Update ItemDTO*/
                 itemBO.updateItem(new ItemDTO(code, description, unitPrice, qtyOnHand));
 
                 ItemTM selectedItem = tblItems.getSelectionModel().getSelectedItem();
